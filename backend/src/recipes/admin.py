@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
-from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag, User
+from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 
 
 class RecipeAdmin(admin.ModelAdmin):
@@ -19,15 +18,8 @@ class IngredientAdmin(admin.ModelAdmin):
     list_filter = ('name',)
 
 
-class CustomUserAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name')
-    list_filter = ('email', 'username')
-
-
 admin.site.register(Recipe, RecipeAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Tag)
 admin.site.register(RecipeIngredient)
 admin.site.register(RecipeTag)
-admin.site.unregister(User)
-admin.site.register(User, CustomUserAdmin)
