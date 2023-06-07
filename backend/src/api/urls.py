@@ -4,4 +4,5 @@ app_name = 'api'
 
 urlpatterns = [
     path('', include('users.urls', 'users')),
+    path('', include('recipes.urls', 'recipes')),
 ]
