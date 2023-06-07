@@ -16,8 +16,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
-      - static_value:/app/static/
-      - media_value:/app/media/
+
   db:
     image: postgres
     env_file:
@@ -32,15 +31,9 @@ services:
     restart: always
     volumes:
       - ../backend/src/:/app/
-      - static_value:/app/static/
-      - media_value:/app/media/
     ports:
       - "8080:80"
     depends_on:
       - db
     env_file:
       - .env
-
-volumes:
-  static_value:
-  media_value:
