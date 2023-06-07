@@ -18,47 +18,64 @@ class UserViewTests(APITestCase):
         cls.test_token = Token.objects.create(user=cls.test_user)
 
     def setUp(self):
-        self.authenticated_client = APIClient()
-        self.authenticated_client.credentials(
+        self.authorized_client = APIClient()
+        self.authorized_client.credentials(
             HTTP_AUTHORIZATION='Token ' + self.test_token.key)
 
-        self.unauthenticated_client = APIClient()
+        self.unauthorized_client = APIClient()
 
-    def test_user_list(self):
-        response = self.authenticated_client.get(
+    def test_user_list_authorized_user(self):
+        response = self.authorized_client.get(
             reverse('api:users:user-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_user_detail(self):
-        response = self.authenticated_client.get(
+    def test_user_list_unauthorized_user(self):
+        response = self.unauthorized_client.get(
+            reverse('api:users:user-list'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_user_detail_unauthorized_user(self):
+        response = self.unauthorized_client.get(
             reverse('api:users:user-detail', args=[self.test_user.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_me(self):
-        response = self.authenticated_client.get(reverse('api:users:user-me'))
+        response = self.authorized_client.get(reverse('api:users:user-me'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_auth_token_login(self):
-        response = self.unauthenticated_client.post(
+    def test_login(self):
+        response = self.unauthorized_client.post(
             reverse('api:users:user-login'),
             {'email': 'user@user.co', 'password': '1qa!QA1qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_auth_token_logout(self):
-        response = self.authenticated_client.post(
+    def test_logout_authorized_user(self):
+        response = self.authorized_client.post(
             reverse('api:users:user-logout'))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_set_password(self):
-        response = self.authenticated_client.post(
+    def test_logout_unauthorized_user(self):
+        response = self.unauthorized_client.post(
+            reverse('api:users:user-logout'))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_change_password_authorized_user(self):
+        response = self.authorized_client.post(
             reverse('api:users:user-set-password'),
             {'current_password': '1qa!QA1qa', 'new_password': '1qa!QA2qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    
+    def test_change_password_unauthorized_user(self):
+        response = self.unauthorized_client.post(
+            reverse('api:users:user-set-password'),
+            {'current_password': '1qa!QA1qa', 'new_password': '1qa!QA2qa'}
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_post_user(self):
-        response = self.unauthenticated_client.post(
+    def test_registraion(self):
+        response = self.unauthorized_client.post(
             reverse('api:users:user-list'),
             {
                 'email': 'user2@user.co',

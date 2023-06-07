@@ -22,7 +22,7 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = UsersPaginator
 
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action in ['create', 'retrieve']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
