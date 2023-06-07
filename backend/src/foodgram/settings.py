@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta
+
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -33,14 +33,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'djoser',
     'api',
-    'authentication',
     'recipes',
     'users',
 ]
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,13 +61,8 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    'authentication.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'users.backends.EmailBackend',
 )
-
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-}
 
 ROOT_URLCONF = 'foodgram.urls'
 
@@ -95,21 +88,24 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    # "default": {
-    #     "ENGINE": "django.db.backends.sqlite3",
-    #     "NAME": "mydatabase",
-    # }
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+if DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "mydatabase",
+        }
     }
-}
-
+else:
+    DATABASES = {
+        "default": {
+            'ENGINE': os.getenv('DB_ENGINE'),
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('POSTGRES_USER'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+            'HOST': os.getenv('DB_HOST'),
+            'PORT': os.getenv('DB_PORT'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
