@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# sqlite debug database
+mydatabase
+
 # .DS_Store files
 .DS_Store
 
