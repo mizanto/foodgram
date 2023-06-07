@@ -66,7 +66,7 @@ class UserViewTests(APITestCase):
             {'current_password': '1qa!QA1qa', 'new_password': '1qa!QA2qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    
+
     def test_change_password_unauthorized_user(self):
         response = self.unauthorized_client.post(
             reverse('api:users:user-set-password'),
