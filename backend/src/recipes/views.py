@@ -10,16 +10,12 @@ from .serializers import (TagSerializer,
                           RecipeRetriveSerializer,)
 
 
-class TagViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 viewsets.GenericViewSet):
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class IngredientViewSet(mixins.ListModelMixin,
-                        mixins.RetrieveModelMixin,
-                        viewsets.GenericViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
 
@@ -29,6 +25,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     pagination_class = RecipePaginator
     filterset_fields = ['author', 'tags']
+    http_method_names = ['get', 'post', 'head', 'options', 'patch', 'delete']
 
     def get_permissions(self):
         if self.action in ['create']:

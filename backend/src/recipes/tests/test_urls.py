@@ -1,8 +1,8 @@
+import os
 import shutil
 import tempfile
 
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.test import override_settings
 from PIL import Image
@@ -10,7 +10,6 @@ from rest_framework.test import APIClient, APITestCase
 from rest_framework.authtoken.models import Token
 from rest_framework.views import status
 from urllib.parse import urlparse
-from io import BytesIO
 
 from recipes.models import (Tag,
                             Ingredient,
@@ -22,6 +21,7 @@ from recipes.serializers import (TagSerializer,
 from users.models import User
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+TEST_IMAGE_PATH = os.path.join(TEMP_MEDIA_ROOT, 'test.jpg')
 TEST_BASE64_IMAGE = """
     iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0e \
     cCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==
@@ -109,14 +109,14 @@ class RecipeListViewTests(APITestCase):
             name="potato", measurement_unit="g")
 
         cls.image = Image.new('RGB', (1, 1))
-        cls.image.save('test.jpg')
+        cls.image.save(TEST_IMAGE_PATH)
 
         for i in range(20):
             recipe = Recipe.objects.create(author=cls.test_user,
                                            name=f'recipe{i}',
                                            text='description',
                                            cooking_time=30)
-            with open('test.jpg', 'rb') as f:
+            with open(TEST_IMAGE_PATH, 'rb') as f:
                 recipe.image.save('test.jpg', f)
             recipe.tags.add(cls.tag)
             RecipeIngredient.objects.create(
@@ -124,8 +124,8 @@ class RecipeListViewTests(APITestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super().tearDownClass()
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
 
     def setUp(self):
         self.authorized_client = APIClient()
@@ -191,14 +191,6 @@ class RecipeListViewTests(APITestCase):
         serializer = RecipeRetriveSerializer(recipe)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertResponseMatchesSerializer(response.data, serializer.data)
-
-    def generate_image_file(self):
-        image = Image.new('RGB', (100, 100))
-        image_io = BytesIO()
-        image.save(image_io, format='JPEG')
-        image_io.seek(0)
-        return SimpleUploadedFile(
-            'test.jpg', image_io.read(), content_type='image/jpeg')
 
     def test_create_recipe(self):
         tag = Tag.objects.create(name='Tag1')
