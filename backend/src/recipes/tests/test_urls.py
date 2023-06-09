@@ -133,17 +133,6 @@ class RecipeListViewTests(APITestCase):
             HTTP_AUTHORIZATION='Token ' + self.test_token.key)
         self.unauthorized_client = APIClient()
 
-    def create_mock_recipe(self, author, name, text):
-        with open('test.jpg', 'rb') as f:
-            recipe = Recipe.objects.create(
-                author=author,
-                name=name,
-                text=text,
-                cooking_time=10,
-                image=File(f, 'test.jpg')
-            )
-        return recipe
-
     def assertResponseMatchesSerializer(self, response_item, serializer_item):
         for key in response_item.keys():
             if key == 'image':
