@@ -1,14 +1,13 @@
 from rest_framework import mixins, viewsets, filters, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .serializers import (TagSerializer,
-                          IngredientSerializer,
-                          RecipeListSerializer,
-                          RecipeDetailSerializer,
-                          RecipeCreateUpdateSerializer,)
 from .models import Tag, Ingredient, Recipe
 from .paginators import RecipePaginator
 from .permissions import IsOwner
+from .serializers import (TagSerializer,
+                          IngredientSerializer,
+                          RecipeCreateUpdateSerializer,
+                          RecipeRetriveSerializer,)
 
 
 class TagViewSet(mixins.ListModelMixin,
@@ -39,18 +38,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return [permissions.AllowAny()]
 
     def get_serializer_class(self):
-        if self.action in ['list']:
-            return RecipeListSerializer
-        elif self.action in ['retrieve']:
-            return RecipeDetailSerializer
-        elif self.action in ['create', 'update']:
+        if self.action in ['list', 'retrieve']:
+            return RecipeRetriveSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
             return RecipeCreateUpdateSerializer
+        elif self.action == 'remove':
+            print('remove')
+            return None
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-    def get_allowed_methods(self):
-        methods = super().get_allowed_methods()
-        if 'put' in methods:
-            methods.remove('put')
-        return methods

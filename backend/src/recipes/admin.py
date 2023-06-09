@@ -4,8 +4,8 @@ from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'get_favorites_count')
-    list_filter = ('author', 'title', 'tags')
+    list_display = ('name', 'author', 'get_favorites_count')
+    list_filter = ('author', 'name', 'tags')
 
     def get_favorites_count(self, obj):
         return obj.favorites.count()
