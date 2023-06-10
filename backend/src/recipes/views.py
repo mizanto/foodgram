@@ -7,7 +7,7 @@ from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Tag
 from .paginators import RecipePaginator
 from .permissions import IsOwner
-from .serializers import (FavoriteRecipeSerializer,
+from .serializers import (ShortRecipeSerializer,
                           IngredientSerializer,
                           RecipeCreateUpdateSerializer,
                           RecipeRetriveSerializer,
@@ -66,7 +66,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         _, created = Favorite.objects.get_or_create(
             user=request.user, recipe=recipe)
         if created:
-            serializer = FavoriteRecipeSerializer(recipe)
+            serializer = ShortRecipeSerializer(recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({"detail": "Recipe is already in favorites."},
