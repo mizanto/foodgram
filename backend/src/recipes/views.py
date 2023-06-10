@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
+from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Tag
 from .paginators import RecipePaginator
 from .permissions import IsOwner
@@ -25,10 +26,11 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    pagination_class = RecipePaginator
-    filterset_fields = ['author', 'tags']
     http_method_names = ['get', 'post', 'head', 'options', 'patch', 'delete']
+    pagination_class = RecipePaginator
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    filterset_class = RecipeFilter
+    filterset_fields = ['author', 'tags', 'is_favorited']
 
     def get_permissions(self):
         if self.action in ['create']:
