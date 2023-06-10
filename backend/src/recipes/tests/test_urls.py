@@ -11,10 +11,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import status
 from urllib.parse import urlparse
 
-from recipes.models import (Tag,
+from recipes.models import (Favorite,
                             Ingredient,
                             Recipe,
-                            RecipeIngredient)
+                            RecipeIngredient,
+                            Tag,)
 from recipes.serializers import (TagSerializer,
                                  IngredientSerializer,
                                  RecipeRetriveSerializer,)
@@ -270,3 +271,51 @@ class RecipeListViewTests(APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertFalse(Recipe.objects.filter(id=first_recipe.id).exists())
+
+    def test_add_to_favorites(self):
+        recipe = Recipe.objects.create(author=self.test_user,
+                                       name='recipe for favorite',
+                                       text='description',
+                                       cooking_time=30)
+        Favorite.objects.filter(user=self.test_user, recipe=recipe).delete()
+        response = self.authorized_client.post(
+            reverse('api:recipes:recipe-favorite', kwargs={'pk': recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Favorite.objects.filter(user=self.test_user,
+                                                recipe=recipe).exists())
+
+    def test_remove_from_favorites(self):
+        recipe = Recipe.objects.create(author=self.test_user,
+                                       name='recipe for favorite',
+                                       text='description',
+                                       cooking_time=30)
+        Favorite.objects.create(user=self.test_user, recipe=recipe)
+        response = self.authorized_client.delete(
+            reverse('api:recipes:recipe-favorite', kwargs={'pk': recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Favorite.objects.filter(user=self.test_user,
+                                                 recipe=recipe).exists())
+
+    def test_add_to_favorites_twice(self):
+        recipe = Recipe.objects.create(author=self.test_user,
+                                       name='recipe for favorite',
+                                       text='description',
+                                       cooking_time=30)
+        Favorite.objects.create(user=self.test_user, recipe=recipe)
+        response = self.authorized_client.post(
+            reverse('api:recipes:recipe-favorite', kwargs={'pk': recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_remove_from_favorites_not_existed(self):
+        recipe = Recipe.objects.create(author=self.test_user,
+                                       name='recipe for favorite',
+                                       text='description',
+                                       cooking_time=30)
+        Favorite.objects.filter(user=self.test_user, recipe=recipe).delete()
+        response = self.authorized_client.delete(
+            reverse('api:recipes:recipe-favorite', kwargs={'pk': recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

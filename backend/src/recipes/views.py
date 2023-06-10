@@ -1,13 +1,16 @@
-from rest_framework import mixins, viewsets, filters, permissions
+from rest_framework import viewsets, filters, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Tag, Ingredient, Recipe
+from .models import Favorite, Ingredient, Recipe, Tag
 from .paginators import RecipePaginator
 from .permissions import IsOwner
-from .serializers import (TagSerializer,
+from .serializers import (FavoriteRecipeSerializer,
                           IngredientSerializer,
                           RecipeCreateUpdateSerializer,
-                          RecipeRetriveSerializer,)
+                          RecipeRetriveSerializer,
+                          TagSerializer,)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -45,3 +48,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True,
+            methods=['post', 'delete'],
+            permission_classes=[permissions.IsAuthenticated],
+            url_path='favorite')
+    def favorite(self, request, pk=None):
+        recipe = self.get_object()
+        if request.method == 'POST':
+            return self.add_to_favorites(request, recipe)
+        elif request.method == 'DELETE':
+            return self.remove_from_favorites(request, recipe)
+
+    def add_to_favorites(self, request, recipe):
+        _, created = Favorite.objects.get_or_create(
+            user=request.user, recipe=recipe)
+        if created:
+            serializer = FavoriteRecipeSerializer(recipe)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"detail": "Recipe is already in favorites."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    def remove_from_favorites(self, request, recipe):
+        _, exists = Favorite.objects.filter(
+            user=request.user, recipe=recipe).delete()
+        if exists:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({"detail": "Recipe is not in favorites."},
+                            status=status.HTTP_400_BAD_REQUEST)
