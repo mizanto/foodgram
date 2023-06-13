@@ -177,7 +177,7 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FavoriteRecipeSerializer(serializers.ModelSerializer):
+class ShortRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
