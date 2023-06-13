@@ -6,10 +6,10 @@ from django.conf import settings
 from django.urls import reverse
 from django.test import override_settings
 from PIL import Image
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient, APITestCase, APIRequestFactory
 from rest_framework.authtoken.models import Token
 from rest_framework.views import status
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 
 from recipes.models import (Favorite,
                             Ingredient,
@@ -114,11 +114,13 @@ class RecipeListViewTests(APITestCase):
         super().tearDownClass()
 
     @staticmethod
-    def _create_test_user():
+    def _create_test_user(email='user@user.co',
+                          username='user',
+                          password='1qa!QA1qa'):
         test_user = User.objects.create_user(
-            email='user@user.co',
-            username='user',
-            password='1qa!QA1qa'
+            email=email,
+            username=username,
+            password=password,
         )
         test_token = Token.objects.create(user=test_user)
         return test_user, test_token
@@ -208,6 +210,39 @@ class RecipeListViewTests(APITestCase):
         response = self.unauthorized_client.get(
             reverse('api:recipes:recipe-list'), {"author": self.test_user.id})
         recipes = Recipe.objects.filter(author__id=1)
+        serializer = RecipeRetriveSerializer(recipes, many=True)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListResponseMatchesSerializer(response, serializer)
+
+    def test_get_recipes_list_with_is_favorited_filter(self):
+        Favorite.objects.create(
+            user=self.test_user, recipe=self.recipe)
+
+        response = self.authorized_client.get(
+            reverse('api:recipes:recipe-list'), {"is_favorited": True}
+        )
+        recipes = Recipe.objects.filter(favorited_by__user=self.test_user)
+
+        factory = APIRequestFactory()
+        request = factory.get(reverse('api:recipes:recipe-list'))
+        request.user = self.test_user
+        serializer = RecipeRetriveSerializer(
+            recipes, many=True, context={'request': request})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListResponseMatchesSerializer(response, serializer)
+
+    def test_get_recipes_list_with_multiple_tags_filter(self):
+        tag1 = Tag.objects.create(name="lunch", color="#E16B8C", slug="lunch")
+        tag2 = Tag.objects.create(name="dinner", color="#884898", slug="dinner")
+
+        self.recipe.tags.add(tag1, tag2)
+
+        tag_slugs = [tag1.slug, tag2.slug]
+        url_params = urlencode([('tags', slug) for slug in tag_slugs], doseq=True)
+        response = self.unauthorized_client.get(
+            f"{reverse('api:recipes:recipe-list')}?{url_params}")
+        recipes = Recipe.objects.filter(tags__slug__in=tag_slugs)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListResponseMatchesSerializer(response, serializer)

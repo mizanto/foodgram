@@ -38,7 +38,7 @@ class Recipe(models.Model):
         ordering = ('-created_at',)
 
     def __str__(self):
-        return self.title
+        return f'{self.name} by {self.author.username}'
 
 
 class RecipeIngredient(models.Model):
