@@ -80,13 +80,13 @@ class UserViewSet(viewsets.ModelViewSet):
             url_path='subscribe')
     def subscribe(self, request, pk=None):
         if request.method == 'POST':
-            return self.add_subscription(request, pk)
+            return self._add_subscription(request, pk)
         elif request.method == 'DELETE':
-            return self.remove_subscription(request, pk)
+            return self._remove_subscription(request, pk)
         else:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def add_subscription(self, request, pk=None):
+    def _add_subscription(self, request, pk=None):
         user_to_subscribe = self.get_object()
 
         _, created = Subscription.objects.get_or_create(
@@ -99,7 +99,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response({"detail": "You are already subscribed to this user."},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    def remove_subscription(self, request, pk=None):
+    def _remove_subscription(self, request, pk=None):
         user_to_unsubscribe = self.get_object()
         subscription = Subscription.objects.filter(
             user=request.user, author=user_to_unsubscribe).first()

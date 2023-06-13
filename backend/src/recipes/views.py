@@ -55,9 +55,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         recipe = self.get_object()
         if request.method == 'POST':
-            return self.add_to_favorites(request, recipe)
+            return self._add_to_favorites(request, recipe)
         elif request.method == 'DELETE':
-            return self.remove_from_favorites(request, recipe)
+            return self._remove_from_favorites(request, recipe)
 
     @action(detail=True,
             methods=['post', 'delete'],
@@ -69,11 +69,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         recipe = self.get_object()
         if request.method == 'POST':
-            return self.add_to_shopping_cart(request, recipe)
+            return self._add_to_shopping_cart(request, recipe)
         elif request.method == 'DELETE':
-            return self.remove_from_shopping_cart(request, recipe)
+            return self._remove_from_shopping_cart(request, recipe)
 
-    def add_to_shopping_cart(self, request, recipe):
+    def _add_to_shopping_cart(self, request, recipe):
         _, created = ShoppingCart.objects.get_or_create(
             user=request.user, recipe=recipe)
         if created:
@@ -83,7 +83,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Recipe is already in shopping cart."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def remove_from_shopping_cart(self, request, recipe):
+    def _remove_from_shopping_cart(self, request, recipe):
         deleted_count, _ = ShoppingCart.objects.filter(
             user=request.user, recipe=recipe).delete()
         if deleted_count > 0:
@@ -92,7 +92,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Recipe is not in shopping cart."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def add_to_favorites(self, request, recipe):
+    def _add_to_favorites(self, request, recipe):
         _, created = Favorite.objects.get_or_create(
             user=request.user, recipe=recipe)
         if created:
@@ -102,7 +102,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response({"detail": "Recipe is already in favorites."},
                             status=status.HTTP_400_BAD_REQUEST)
 
-    def remove_from_favorites(self, request, recipe):
+    def _remove_from_favorites(self, request, recipe):
         deleted_count, _ = Favorite.objects.filter(
             user=request.user, recipe=recipe).delete()
         if deleted_count > 0:
