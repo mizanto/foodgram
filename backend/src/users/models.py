@@ -15,3 +15,6 @@ class Subscription(models.Model):
 
     class Meta:
         unique_together = ('user', 'author')
+
+    def __str__(self):
+        return f'{self.user} follows {self.author}'

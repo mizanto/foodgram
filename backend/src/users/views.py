@@ -9,10 +9,10 @@ from django.contrib.auth.hashers import check_password
 
 from .models import Subscription
 from .paginators import UsersPaginator
-from .serializers import (UserSerializer,
+from .serializers import (SetPasswordSerializer,
+                          UserSerializer,
                           UserRegisterSerializer,
-                          UserLoginSerializer,
-                          SetPasswordSerializer)
+                          UserLoginSerializer,)
 
 User = get_user_model()
 
@@ -32,13 +32,15 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserRegisterSerializer
         return super().get_serializer_class()
 
-    @action(detail=False, methods=['get'],
+    @action(detail=False,
+            methods=['get'],
             permission_classes=[IsAuthenticated])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'],
+    @action(detail=False,
+            methods=['post'],
             permission_classes=[IsAuthenticated])
     def set_password(self, request):
         serializer = SetPasswordSerializer(data=request.data)
@@ -59,24 +61,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True,
-            methods=['get', 'post', 'delete'],
-            name='Manage Subscriptions',
-            url_path='subscriptions')
-    def subscriptions(self, request, pk=None):
-        if request.method == 'GET':
-            return self.get_subscriptions(request)
-        elif request.method == 'POST':
-            return self.subscribe(request)
-        elif request.method == 'DELETE':
-            return self.unsubscribe(request)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def get_subscriptions(self, request):
-        subscriptions = Subscription.objects.filter(user=request.user)
-        page = self.paginate_queryset(subscriptions)  # Используем пагинацию
-
+    @action(detail=False,
+            methods=['get'],
+            permission_classes=[IsAuthenticated])
+    def subscriptions(self, request):
+        subscriptions = User.objects.filter(following__user=request.user)
+        page = self.paginate_queryset(subscriptions)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
@@ -84,26 +74,36 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(subscriptions, many=True)
         return Response(serializer.data)
 
-    def subscribe(self, request):
-        user_to_unsubscribe = self.get_object()
-        subscription = Subscription.objects.filter(
-            user=request.user, author=user_to_unsubscribe).first()
+    @action(detail=True,
+            methods=['post'],
+            permission_classes=[IsAuthenticated],
+            url_path='subscribe')
+    def subscribe(self, request, pk=None):
+        user_to_subscribe = self.get_object()
 
-        if subscription:
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        _, created = Subscription.objects.get_or_create(
+            user=request.user, author=user_to_subscribe)
 
-        return Response({"detail": "You are not subscribed to this user."},
+        if created:
+            return Response({"detail": "Successfully subscribed."},
+                            status=status.HTTP_201_CREATED)
+
+        return Response({"detail": "You are already subscribed to this user."},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    def unsubscribe(self, request):
+    @action(detail=True,
+            methods=['delete'],
+            permission_classes=[IsAuthenticated],
+            url_path='unsubscribe')
+    def unsubscribe(self, request, pk=None):
         user_to_unsubscribe = self.get_object()
         subscription = Subscription.objects.filter(
             user=request.user, author=user_to_unsubscribe).first()
 
         if subscription:
             subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "Successfully unsubscribed."},
+                            status=status.HTTP_204_NO_CONTENT)
 
         return Response({"detail": "You are not subscribed to this user."},
                         status=status.HTTP_400_BAD_REQUEST)

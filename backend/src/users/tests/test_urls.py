@@ -10,12 +10,17 @@ User = get_user_model()
 class UserViewTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.test_user = User.objects.create_user(
-            email='user@user.co',
-            username='user',
+        cls.test_user1 = User.objects.create_user(
+            email='user1@user.co',
+            username='user1',
             password='1qa!QA1qa'
         )
-        cls.test_token = Token.objects.create(user=cls.test_user)
+        cls.test_user2 = User.objects.create_user(
+            email='user2@user.co',
+            username='user2',
+            password='1qa!QA1qa'
+        )
+        cls.test_token = Token.objects.create(user=cls.test_user1)
 
     def setUp(self):
         self.authorized_client = APIClient()
@@ -23,6 +28,9 @@ class UserViewTests(APITestCase):
             HTTP_AUTHORIZATION='Token ' + self.test_token.key)
 
         self.unauthorized_client = APIClient()
+
+        self.test_user1.follower.create(
+            author=self.test_user2, user=self.test_user1)
 
     def test_user_list_authorized_user(self):
         response = self.authorized_client.get(
@@ -36,7 +44,7 @@ class UserViewTests(APITestCase):
 
     def test_user_detail_unauthorized_user(self):
         response = self.unauthorized_client.get(
-            reverse('api:users:user-detail', args=[self.test_user.id]))
+            reverse('api:users:user-detail', args=[self.test_user1.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_me(self):
@@ -46,7 +54,7 @@ class UserViewTests(APITestCase):
     def test_login(self):
         response = self.unauthorized_client.post(
             reverse('api:users:user-login'),
-            {'email': 'user@user.co', 'password': '1qa!QA1qa'}
+            {'email': 'user1@user.co', 'password': '1qa!QA1qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -78,9 +86,35 @@ class UserViewTests(APITestCase):
         response = self.unauthorized_client.post(
             reverse('api:users:user-list'),
             {
-                'email': 'user2@user.co',
-                'username': 'user2',
+                'email': 'new_user@user.co',
+                'username': 'new_user',
                 'password': '1qa!QA1qa'
             }
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_get_subscriptions(self):
+        response = self.authorized_client.get(
+            reverse('api:users:user-subscriptions'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], self.test_user2.email)
+
+    def test_create_subscription(self):
+        new_user = User.objects.create_user(
+            email="user3@test.com", username='user3', password="password")
+        response = self.authorized_client.post(
+            reverse('api:users:user-subscribe', kwargs={'pk': new_user.id}))
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            self.test_user1.follower.filter(author=new_user).exists())
+
+    def test_user_unsubscribe(self):
+        new_user = User.objects.create_user(
+            email="user3@test.com", username='user3', password="password")
+        self.test_user1.follower.create(author=new_user, user=self.test_user1)
+        response = self.authorized_client.delete(
+            reverse('api:users:user-unsubscribe', kwargs={'pk': new_user.id}))
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(
+            self.test_user1.follower.filter(author=new_user).exists())
