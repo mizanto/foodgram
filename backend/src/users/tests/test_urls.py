@@ -114,7 +114,7 @@ class UserViewTests(APITestCase):
             email="user3@test.com", username='user3', password="password")
         self.test_user1.follower.create(author=new_user, user=self.test_user1)
         response = self.authorized_client.delete(
-            reverse('api:users:user-unsubscribe', kwargs={'pk': new_user.id}))
+            reverse('api:users:user-subscribe', kwargs={'pk': new_user.id}))
         self.assertEqual(response.status_code, 204)
         self.assertFalse(
             self.test_user1.follower.filter(author=new_user).exists())
