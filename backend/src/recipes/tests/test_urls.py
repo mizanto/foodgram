@@ -269,7 +269,8 @@ class RecipeListViewTests(APITestCase):
         }
 
         response = self.authorized_client.patch(
-            reverse('api:recipes:recipe-detail', kwargs={'pk': self.recipe.id}),
+            reverse('api:recipes:recipe-detail',
+                    kwargs={'pk': self.recipe.id}),
             data=recipe_data,
             format='json'
         )
@@ -348,9 +349,33 @@ class RecipeListViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(query_set.exists())
 
+    def test_remove_recipe_from_shopping_cart_not_existed(self):
+        response = self.authorized_client.delete(
+            reverse('api:recipes:recipe-shopping-cart',
+                    kwargs={'pk': self.recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_remove_recipe_from_shopping_cart_unauthenticated(self):
         response = self.unauthorized_client.delete(
             reverse('api:recipes:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_add_recipe_to_shopping_cart_twice(self):
+        ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
+        response = self.authorized_client.post(
+            reverse('api:recipes:recipe-shopping-cart',
+                    kwargs={'pk': self.recipe.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_download_shopping_cart(self):
+        ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
+        response = self.authorized_client.get(
+            reverse('api:recipes:recipe-download-shopping-cart')
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(response.content)
+        self.assertTrue(len(response.content) > 0)
