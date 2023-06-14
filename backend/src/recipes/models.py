@@ -38,7 +38,7 @@ class Recipe(models.Model):
         ordering = ('-created_at',)
 
     def __str__(self):
-        return self.title
+        return f'{self.name} by {self.author.username}'
 
 
 class RecipeIngredient(models.Model):
@@ -67,6 +67,19 @@ class Favorite(models.Model):
         User, on_delete=models.CASCADE, related_name='favorites')
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE, related_name='favorited_by')
+
+    class Meta:
+        unique_together = ('user', 'recipe',)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe.title}'
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='shopping_cart')
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='in_cart')
 
     class Meta:
         unique_together = ('user', 'recipe',)

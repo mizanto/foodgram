@@ -4,7 +4,11 @@ import uuid
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from .models import Tag, Ingredient, Recipe, RecipeIngredient, RecipeTag
+from .models import (Ingredient,
+                     Recipe,
+                     RecipeIngredient,
+                     RecipeTag,
+                     Tag)
 from users.serializers import UserSerializer
 
 
@@ -57,17 +61,24 @@ class RecipeRetriveSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientSerializer(
         source='recipeingredient_set', many=True)
     is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
         fields = ('id', 'tags', 'ingredients', 'author', 'name', 'text',
-                  'image', 'cooking_time', 'is_favorited')
+                  'image', 'cooking_time', 'is_favorited',
+                  'is_in_shopping_cart')
 
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.favorited_by.filter(user=request.user).exists()
         return False
+
+    def get_is_in_shopping_cart(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.in_cart.filter(user=request.user).exists()
 
 
 class Base64ImageField(serializers.ImageField):
