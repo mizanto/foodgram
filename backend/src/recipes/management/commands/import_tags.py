@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
 
 def import_tags_from_csv(csv_path):
-    print(f'Importing ingredients from {csv_path}')
+    print(f'Importing tags from {csv_path}')
     with open(csv_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
