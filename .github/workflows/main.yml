@@ -28,4 +28,5 @@ jobs:
 
       - name: Run tests
         run: |
+          cd backend/src
           python manage.py test
