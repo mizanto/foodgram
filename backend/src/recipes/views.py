@@ -22,8 +22,17 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+
+    def get_queryset(self):
+        queryset = Ingredient.objects.all()
+        name = self.request.query_params.get('name', None)
+        if name is not None:
+            startswith_queryset = queryset.filter(name__istartswith=name)
+            contains_queryset = queryset.filter(
+                name__icontains=name).exclude(name__istartswith=name)
+            queryset = startswith_queryset.union(contains_queryset)
+        return queryset
 
 
 class RecipeViewSet(viewsets.ModelViewSet):

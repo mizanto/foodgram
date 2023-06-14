@@ -94,6 +94,20 @@ class IngredientTest(APITestCase):
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_search_ingredients(self):
+        response = self.client.get(
+            reverse("api:recipes:ingredient-list"), {'name': 'ingredient'}
+        )
+        startswith_expected = Ingredient.objects.filter(
+            name__istartswith='ingredient')
+        contains_expected = Ingredient.objects.filter(
+            name__icontains='ingredient').exclude(
+            name__istartswith='ingredient')
+        expected = list(startswith_expected) + list(contains_expected)
+        serialized = IngredientSerializer(expected, many=True)
+        self.assertEqual(response.data, serialized.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class RecipeListViewTests(APITestCase):
@@ -234,12 +248,14 @@ class RecipeListViewTests(APITestCase):
 
     def test_get_recipes_list_with_multiple_tags_filter(self):
         tag1 = Tag.objects.create(name="lunch", color="#E16B8C", slug="lunch")
-        tag2 = Tag.objects.create(name="dinner", color="#884898", slug="dinner")
+        tag2 = Tag.objects.create(
+            name="dinner", color="#884898", slug="dinner")
 
         self.recipe.tags.add(tag1, tag2)
 
         tag_slugs = [tag1.slug, tag2.slug]
-        url_params = urlencode([('tags', slug) for slug in tag_slugs], doseq=True)
+        url_params = urlencode(
+            [('tags', slug) for slug in tag_slugs], doseq=True)
         response = self.unauthorized_client.get(
             f"{reverse('api:recipes:recipe-list')}?{url_params}")
         recipes = Recipe.objects.filter(tags__slug__in=tag_slugs)
