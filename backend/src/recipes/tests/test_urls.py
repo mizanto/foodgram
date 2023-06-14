@@ -34,8 +34,8 @@ class TagTest(APITestCase):
             return Tag.objects.create(name=name, color=color, slug=slug)
 
     def setUp(self):
-        self.create_tag("tag1", "#123456", "tag1")
-        self.create_tag("tag2", "#654321", "tag2")
+        self.tag1 = self.create_tag("tag1", "#123456", "tag1")
+        self.tag2 = self.create_tag("tag2", "#654321", "tag2")
 
     def test_get_all_tags(self):
         response = self.client.get(
@@ -48,9 +48,10 @@ class TagTest(APITestCase):
 
     def test_get_single_tag(self):
         response = self.client.get(
-            reverse("api:recipes:tag-detail", kwargs={"pk": 1})
+            reverse("api:recipes:tag-detail",
+                    kwargs={"pk": self.tag1.pk})
         )
-        expected = Tag.objects.get(pk=1)
+        expected = Tag.objects.get(pk=self.tag1.pk)
         serialized = TagSerializer(expected)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -67,8 +68,8 @@ class IngredientTest(APITestCase):
             )
 
     def setUp(self):
-        self.create_ingredient("ingredient1", "kg")
-        self.create_ingredient("ingredient2", "g")
+        self.ingredient1 = self.create_ingredient("ingredient1", "kg")
+        self.ingredient2 = self.create_ingredient("ingredient2", "g")
 
     def test_get_all_ingredients(self):
         response = self.client.get(
@@ -81,9 +82,10 @@ class IngredientTest(APITestCase):
 
     def test_get_single_ingredient(self):
         response = self.client.get(
-            reverse("api:recipes:ingredient-detail", kwargs={"pk": 1})
+            reverse("api:recipes:ingredient-detail",
+                    kwargs={"pk": self.ingredient1.pk})
         )
-        expected = Ingredient.objects.get(pk=1)
+        expected = Ingredient.objects.get(pk=self.ingredient1.pk)
         serialized = IngredientSerializer(expected)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
