@@ -37,7 +37,7 @@ class Recipe(models.Model):
         ordering = ('-created_at',)
 
     def __str__(self):
-        return f'{self.name} by {self.author.username}'
+        return f'{self.name} - {self.author.username}'
 
 
 class RecipeIngredient(models.Model):
@@ -46,7 +46,7 @@ class RecipeIngredient(models.Model):
     amount = models.FloatField()
 
     def __str__(self):
-        return f'{self.ingredient.name} for {self.recipe.title}'
+        return f'{self.ingredient.name} - {self.recipe.name}'
 
 
 class RecipeTag(models.Model):
@@ -58,7 +58,7 @@ class RecipeTag(models.Model):
         help_text='The tag associated with this recipe.')
 
     def __str__(self):
-        return f'{self.recipe.title} - {self.tag.name}'
+        return f'{self.recipe.name} - {self.tag.name}'
 
 
 class Favorite(models.Model):
@@ -71,7 +71,7 @@ class Favorite(models.Model):
         unique_together = ('user', 'recipe',)
 
     def __str__(self):
-        return f'{self.user.username} - {self.recipe.title}'
+        return f'{self.user.username} - {self.recipe.name}'
 
 
 class ShoppingCart(models.Model):
@@ -84,4 +84,4 @@ class ShoppingCart(models.Model):
         unique_together = ('user', 'recipe',)
 
     def __str__(self):
-        return f'{self.user.username} - {self.recipe.title}'
+        return f'{self.user.username} - {self.recipe.name}'

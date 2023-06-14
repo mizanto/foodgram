@@ -9,6 +9,10 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
+    def __str__(self):
+        return f'email: {self.email}, username: ({self.username}) \
+            first_name: {self.first_name}, last_name: {self.last_name}'
+
 
 class Subscription(models.Model):
     user = models.ForeignKey(
