@@ -6,6 +6,9 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     is_subscribed = models.BooleanField(default=False)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
 
 class Subscription(models.Model):
     user = models.ForeignKey(

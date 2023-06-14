@@ -1,5 +1,6 @@
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -19,3 +20,9 @@ class EmailBackend(ModelBackend):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+    def clean(self, email, password):
+        if not email:
+            raise ValidationError('Email field is required')
+        if not password:
+            raise ValidationError('Password field is required')
