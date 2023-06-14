@@ -1,17 +1,15 @@
-from rest_framework import viewsets, filters, permissions, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, ShoppingCart, Tag
 from .paginators import RecipePaginator
 from .permissions import IsOwner
-from .serializers import (ShortRecipeSerializer,
-                          IngredientSerializer,
-                          RecipeCreateUpdateSerializer,
-                          RecipeRetriveSerializer,
-                          TagSerializer,)
+from .serializers import (IngredientSerializer, RecipeCreateUpdateSerializer,
+                          RecipeRetriveSerializer, ShortRecipeSerializer,
+                          TagSerializer)
 from .services.shopping_cart_file_generator import FileGeneratorFactory
 from .services.shopping_cart_service import ShoppingCartService
 

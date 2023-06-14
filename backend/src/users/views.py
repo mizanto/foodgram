@@ -1,18 +1,16 @@
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.hashers import check_password
+from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Subscription
 from .paginators import UsersPaginator
-from .serializers import (SetPasswordSerializer,
-                          UserSerializer,
-                          UserRegisterSerializer,
-                          UserLoginSerializer,)
+from .serializers import (SetPasswordSerializer, UserLoginSerializer,
+                          UserRegisterSerializer, UserSerializer)
 
 User = get_user_model()
 

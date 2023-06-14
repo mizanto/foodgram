@@ -4,12 +4,9 @@ import uuid
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from .models import (Ingredient,
-                     Recipe,
-                     RecipeIngredient,
-                     RecipeTag,
-                     Tag)
 from users.serializers import UserSerializer
+
+from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):

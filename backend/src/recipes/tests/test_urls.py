@@ -1,26 +1,20 @@
 import os
 import shutil
 import tempfile
+from urllib.parse import urlencode, urlparse
 
 from django.conf import settings
-from django.urls import reverse
 from django.test import override_settings
+from django.urls import reverse
 from PIL import Image
-from rest_framework.test import APIClient, APITestCase, APIRequestFactory
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient, APIRequestFactory, APITestCase
 from rest_framework.views import status
-from urllib.parse import urlparse, urlencode
 
-from recipes.models import (Favorite,
-                            Ingredient,
-                            Recipe,
-                            RecipeIngredient,
-                            ShoppingCart,
-                            Tag,)
-
-from recipes.serializers import (TagSerializer,
-                                 IngredientSerializer,
-                                 RecipeRetriveSerializer,)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
+from recipes.serializers import (IngredientSerializer, RecipeRetriveSerializer,
+                                 TagSerializer)
 from users.models import User
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
