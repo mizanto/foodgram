@@ -27,7 +27,6 @@ jobs:
         run: |
           python -m flake8
 
-      - name: Test pytests
+      - name: Run tests
         run: |
           python manage.py test
-				
