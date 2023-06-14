@@ -98,7 +98,7 @@ class Command(BaseCommand):
                 defaults={'measurement_unit': ingredient_data['unit']}
             )
 
-        tags = [Tag.objects.get(name=tag_name) for tag_name in recipe_data['tags']]
+        tags = [Tag.objects.get(name=tag) for tag in recipe_data['tags']]
 
         recipe = Recipe.objects.create(
             author=user,
