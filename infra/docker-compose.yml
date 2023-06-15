@@ -25,7 +25,7 @@ services:
       - /var/lib/postgresql/data/
 
   backend:
-    image: sergben/foodgram:latest
+    image: sergben/foodgram-backend:latest
     restart: always
     volumes:
       - ./backend/src/:/app/
