@@ -96,7 +96,7 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
-          context: backend/src
+          context: .
           file: backend/src/Dockerfile
 
   update_configs:

@@ -10,8 +10,8 @@ RUN apt-get update \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY . /app
+COPY ./backend/src /app
 RUN mkdir /data
-COPY ../../data /data
+COPY ./data /data
 WORKDIR /app
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0.0.0.0:8080"]
