@@ -109,7 +109,7 @@ class Command(BaseCommand):
             cooking_time=recipe_data['cooking_time'],
         )
 
-        image_name = recipe_data['slug'] + '.png'
+        image_name = recipe_data['slug'] + '.jpeg'
         image_path = f"{data_path}img/{image_name}"
         self.stdout.write(self.style.NOTICE(
             f'Importing image for {recipe.name} from {image_path}...'))
