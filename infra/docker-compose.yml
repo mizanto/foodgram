@@ -28,7 +28,7 @@ services:
     image: sergben/foodgram-backend:latest
     restart: always
     volumes:
-      - ./backend/src/:/app/
+      - ./app/:/app/
     ports:
       - "8080:80"
     depends_on:
