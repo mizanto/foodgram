@@ -117,6 +117,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "infra/docker-compose.yml,infra/nginx.conf"
           target: "config/"
+          strip_components: 1
 
   updload_fixtures:
     name: Upload fixtures to server
@@ -136,6 +137,7 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "data/*"
           target: "fixtures/"
+          strip_components: 1
 
   deploy:
     name: Deploy to Yandex.Cloud
