@@ -25,9 +25,7 @@ services:
       - /var/lib/postgresql/data/
 
   backend:
-    build:
-      context: ./backend/src
-      dockerfile: Dockerfile
+    image: sergben/foodgram:latest
     restart: always
     volumes:
       - ./backend/src/:/app/
