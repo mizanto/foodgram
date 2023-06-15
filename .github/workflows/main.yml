@@ -25,6 +25,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/src/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -43,6 +51,7 @@ jobs:
           while ! pg_isready -h localhost -p 5432 > /dev/null 2> /dev/null; do
             sleep 1
           done
+
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -50,6 +59,7 @@ jobs:
     steps:
       - name: Run linter
         run: |
+          cd backend/src
           flake8 --exclude=migrations
 
       - name: Run tests
