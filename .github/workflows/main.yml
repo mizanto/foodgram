@@ -119,30 +119,10 @@ jobs:
           target: "config/"
           strip_components: 1
 
-  updload_fixtures:
-    name: Upload fixtures to server
-    runs-on: ubuntu-latest
-    needs: tests
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Copy files to server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          source: "data/*"
-          target: "fixtures/"
-          strip_components: 1
-
   deploy:
     name: Deploy to Yandex.Cloud
     runs-on: ubuntu-latest
-    needs: [build_and_push_to_docker_hub, update_configs, updload_fixtures]
+    needs: [build_and_push_to_docker_hub, update_configs]
 
     steps:
       - name: Executing remote ssh commands to deploy

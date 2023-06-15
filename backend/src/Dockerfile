@@ -11,5 +11,6 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 COPY . /app
+COPY ../../data /data
 WORKDIR /app
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0.0.0.0:8080"]
