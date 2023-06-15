@@ -97,13 +97,6 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 #     }
 # }
 
-print(os.getenv('DB_ENGINE'))
-print(os.getenv('DB_NAME'))
-print(os.getenv('POSTGRES_USER'))
-print(os.getenv('POSTGRES_PASSWORD'))
-print(os.getenv('DB_HOST'))
-print(os.getenv('DB_PORT'))
-
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE',

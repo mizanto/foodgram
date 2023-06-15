@@ -102,7 +102,7 @@ jobs:
   update_configs:
     name: Update docker-compose and nginx configs
     runs-on: ubuntu-latest
-    needs: build_and_push_to_docker_hub
+    needs: tests
 
     steps:
       - name: Checkout
@@ -118,10 +118,29 @@ jobs:
           source: "infra/docker-compose.yml,infra/nginx.conf"
           target: "home/${{ secrets.USERNAME }}"
 
+  updload_fixtures:
+    name: Upload fixtures to server
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          source: "data/*"
+          target: "home/${{ secrets.USERNAME }}/fixtures"
+
   deploy:
     name: Deploy to Yandex.Cloud
     runs-on: ubuntu-latest
-    needs: update_configs
+    needs: [build_and_push_to_docker_hub, update_configs, updload_fixtures]
 
     steps:
       - name: Executing remote ssh commands to deploy

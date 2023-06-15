@@ -35,3 +35,5 @@ services:
       - db
     env_file:
       - .env
+    volumes:
+      - ./fixtures:/app/fixtures
