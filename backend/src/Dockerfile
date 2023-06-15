@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 RUN mkdir /app
-COPY requirements.txt /app
+COPY ./backend/src/requirements.txt /app
 RUN apt-get update \
     && apt-get -y install libpq-dev gcc \
     && pip3 install --upgrade pip \
