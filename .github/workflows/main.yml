@@ -115,9 +115,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: | 
-            "infra/docker-compose.yml"
-            "infra/nginx.conf"
+          source: "infra/docker-compose.yml,infra/nginx.conf"
           target: "home/${{ secrets.USERNAME }}"
 
   deploy:
