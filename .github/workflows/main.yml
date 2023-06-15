@@ -136,6 +136,8 @@ jobs:
             sudo systemctl stop nginx
             sudo systemctl stop gunicorn
 
+            cd config
+            
             sudo docker-compose stop
             sudo docker-compose rm -f backend
 
