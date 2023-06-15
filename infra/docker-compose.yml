@@ -19,6 +19,8 @@ services:
 
   db:
     image: postgres
+    depends_on:
+      - nginx
     env_file:
       - .env
     volumes:
