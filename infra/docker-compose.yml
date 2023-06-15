@@ -16,9 +16,9 @@ services:
     volumes:
       - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./frontend/build:/usr/share/nginx/html/
-      - static-data:/var/www/static
-      - media-data:/var/www/media
       - ../docs/:/usr/share/nginx/html/api/docs/
+      - static_value:/var/html/static/
+      - media_value:/var/html/media/
 
   db:
     image: postgres
@@ -40,9 +40,9 @@ services:
     env_file:
       - .env
     volumes:
-      - static-data:/var/www/static
-      - media-data:/var/www/media
+      - static_value:/app/static/
+      - media_value:/app/media/
 
 volumes:
-  static-data:
-  media-data:
+  static_value:
+  media_value:
