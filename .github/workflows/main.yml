@@ -116,7 +116,7 @@ jobs:
           key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "infra/docker-compose.yml,infra/nginx.conf"
-          target: "/"
+          target: "./"
           strip_components: 1
 
   deploy:
