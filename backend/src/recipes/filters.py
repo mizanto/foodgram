@@ -25,6 +25,12 @@ class RecipeFilter(filters.FilterSet):
 
     def filter_by_tags(self, queryset, name, value):
         tag_slugs = self.request.query_params.getlist('tags')
-        for slug in tag_slugs:
-            queryset = queryset.filter(tags__slug=slug)
+        if tag_slugs:
+            queryset = queryset.filter(tags__slug__in=tag_slugs).distinct()
         return queryset
+
+    # def filter_by_tags(self, queryset, name, value):
+    #     tag_slugs = self.request.query_params.getlist('tags')
+    #     for slug in tag_slugs:
+    #         queryset = queryset.filter(tags__slug=slug)
+    #     return queryset
