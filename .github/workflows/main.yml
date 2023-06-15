@@ -97,6 +97,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo systemctl stop nginx
             sudo systemctl stop gunicorn
