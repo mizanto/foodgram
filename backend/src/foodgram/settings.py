@@ -108,6 +108,13 @@ DATABASES = {
     }
 }
 
+print("DB_ENGINE:", DATABASES['default']['ENGINE'])
+print("DB_NAME:", DATABASES['default']['NAME'])
+print("POSTGRES_USER:", DATABASES['default']['USER'])
+print("POSTGRES_PASSWORD:", DATABASES['default']['PASSWORD'])
+print("DB_HOST:", DATABASES['default']['HOST'])
+print("DB_PORT:", DATABASES['default']['PORT'])
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
