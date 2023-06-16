@@ -147,7 +147,10 @@ jobs:
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
 
-            sudo docker image rm --force $(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}foodgram-backend)
+            IMAGE_IDS=$(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/foodgram-backend)
+            if [ -n "$IMAGE_IDS" ]; then
+                sudo docker image rm --force $IMAGE_IDS
+            fi
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
             sudo docker-compose up -d
 
