@@ -43,7 +43,6 @@ class UserViewSet(viewsets.ModelViewSet):
     def set_password(self, request):
         serializer = SetPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            # check old password
             current_password_valid = check_password(
                 serializer.validated_data.get('current_password'),
                 request.user.password
@@ -51,11 +50,9 @@ class UserViewSet(viewsets.ModelViewSet):
             if not current_password_valid:
                 return Response({"current_password": ["Wrong password."]},
                                 status=status.HTTP_400_BAD_REQUEST)
-            # set new password
             request.user.set_password(
                 serializer.validated_data.get('new_password'))
             request.user.save()
-            # send no content response
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -63,7 +60,8 @@ class UserViewSet(viewsets.ModelViewSet):
             methods=['get'],
             permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        subscriptions = User.objects.filter(following__user=request.user)
+        subscriptions = User.objects.filter(
+            following__user=request.user).order_by('username')
         page = self.paginate_queryset(subscriptions)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
