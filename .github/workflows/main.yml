@@ -6,6 +6,7 @@ jobs:
   tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    needs: [send_message]
 
     services:
       postgres:
@@ -75,7 +76,7 @@ jobs:
   build_and_push_to_docker_hub:
     name: Push image to Docker Hub
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests, send_message]
             
     steps:
       - name: Checkout
@@ -101,7 +102,7 @@ jobs:
   update_configs:
     name: Update configs
     runs-on: ubuntu-latest
-    needs: tests
+    needs: [tests, send_message]
 
     steps:
       - name: Checkout
@@ -121,7 +122,7 @@ jobs:
   deploy:
     name: Deploy to Yandex.Cloud
     runs-on: ubuntu-latest
-    needs: [build_and_push_to_docker_hub, update_configs]
+    needs: [build_and_push_to_docker_hub, update_configs, send_message]
 
     steps:
       - name: Executing remote ssh commands to deploy
@@ -159,11 +160,18 @@ jobs:
   send_message:
     name: Send message
     runs-on: ubuntu-latest
-    needs: deploy
+    if: always()
     steps:
-      - name: Send success message to Telegram
+      - name: Send Telegram message
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: "Foodgram workflow finished successfully! 🎉 Check it on ${{ secrets.DNS_ADDRESS }}"
+          message: |
+            ${{ if (success()) }} 
+              Foodgram workflow finished successfully! 🎉
+            ${{ else }}
+              Foodgram workflow failed! ❌
+              Job: ${{ job.status }}
+              Step: ${{ github.job }}
+            ${{ endif }}
