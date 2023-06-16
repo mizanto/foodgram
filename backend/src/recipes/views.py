@@ -103,9 +103,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        response = Response(content, status=status.HTTP_200_OK)
+        response = Response(content, content_type=content_type)
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        response['Content-Type'] = content_type
         return response
 
     def _get_format(self, request):
