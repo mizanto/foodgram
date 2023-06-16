@@ -153,9 +153,9 @@ jobs:
             sudo docker-compose -f docker-compose.prod.yml up -d
 
             # выполняем миграции, собираем статику и загружаем данные
-            sudo docker-compose -f docker-compose.prod.yml exec backend python manage.py migrate
-            sudo docker-compose -f docker-compose.prod.yml exec backend python manage.py collectstatic --no-input
-            sudo docker-compose -f docker-compose.prod.yml exec backend python manage.py import_basic_data ../data/
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --no-input
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py import_basic_data ../data/
         
 
   send_message:
