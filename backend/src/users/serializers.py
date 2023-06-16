@@ -59,9 +59,14 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         from recipes.serializers import ShortRecipeSerializer
 
-        recipes = Recipe.objects.filter(
-            author=obj
-        )[:self.context['request'].query_params.get('recipes_limit', 5)]
+        recipes_limit = self.context['request'].query_params.get(
+            'recipes_limit')
+        try:
+            recipes_limit = int(recipes_limit)
+        except ValueError:
+            recipes_limit = None
+
+        recipes = Recipe.objects.filter(author=obj)[:recipes_limit]
         return ShortRecipeSerializer(recipes, many=True).data
 
     def get_is_subscribed(self, obj):
