@@ -145,11 +145,10 @@ jobs:
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
 
-            IMAGE_IDS=$(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/foodgram-backend)
-            if [ -n "$IMAGE_IDS" ]; then
-                sudo docker image rm --force $IMAGE_IDS
-            fi
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
+            sudo docker image rm sergben/foodgram-backend:latest
+            sudo docker pull sergben/foodgram-backend:latest
+
+            # sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
 
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --no-input
