@@ -1,3 +1,7 @@
+[![Foodgram workflow](https://github.com/mizanto/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/mizanto/foodgram-project-react/actions/workflows/main.yml)
+
+
+https://github.com/mizanto/foodgram-project-react/blob/master/.github/workflows/main.yml
 # Foodgram - Ваш рецепт успеха
 [Foodgram]() - это проект, в котором пользователи могут делиться своими кулинарными рецептами, а также подписываться на понравившихся авторов и сохранять лучшие рецепты в своих "Избранных".
 
