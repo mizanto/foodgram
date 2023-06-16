@@ -135,7 +135,7 @@ jobs:
             sudo systemctl stop nginx
             sudo systemctl stop gunicorn
 
-            sudo docker-compose stop
+            sudo docker-compose -f docker-compose.prod.yml stop
 
             touch .env
             echo "DB_ENGINE=${{ secrets.DB_ENGINE }}" > .env
@@ -152,9 +152,9 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
             sudo docker-compose -f docker-compose.prod.yml up -d
 
-            sudo docker-compose exec -T backend python manage.py migrate
-            sudo docker-compose exec -T backend python manage.py collectstatic --no-input
-            sudo docker-compose exec -T backend python manage.py import_basic_data ../data/
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --no-input
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py import_basic_data ../data/
 
   send_message:
     name: Send message
