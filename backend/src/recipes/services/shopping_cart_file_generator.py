@@ -24,7 +24,8 @@ class TextFileGenerator(FileGenerator):
         content.write('Список покупок:')
 
         for name, data in ingredients.items():
-            content.line(f'{name} - {data["amount"]} {data["measurement_unit"]}')
+            content.write(
+                f'{name} - {data["amount"]} {data["measurement_unit"]}')
 
         content = content.getvalue()
         # content = 'Список покупок:\n\n'
