@@ -20,10 +20,17 @@ class FileGenerator:
 
 class TextFileGenerator(FileGenerator):
     def generate(self, ingredients):
-        content = 'Список покупок:\n\n'
+        content = io.StringIO()
+        content.write('Список покупок:')
+
         for name, data in ingredients.items():
-            content += f'{name} - {data["amount"]} \
-                {data["measurement_unit"]}\n'
+            content.line(f'{name} - {data["amount"]} {data["measurement_unit"]}')
+
+        content = content.getvalue()
+        # content = 'Список покупок:\n\n'
+        # for name, data in ingredients.items():
+        #     content += f'{name} - {data["amount"]} \
+        #         {data["measurement_unit"]}\n'
         return content, 'shopping_cart.txt', 'text/plain, charset=utf-8'
 
 

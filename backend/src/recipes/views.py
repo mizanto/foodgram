@@ -112,7 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         format = request.query_params.get('format')
         if format and format.lower() in ['txt', 'csv']:
             return format
-        return 'csv'
+        return 'txt'
 
     def _add_to_shopping_cart(self, request, recipe):
         _, created = ShoppingCart.objects.get_or_create(
