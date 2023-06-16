@@ -24,6 +24,8 @@ class TextFileGenerator(FileGenerator):
         for name, data in ingredients.items():
             content += f'{name} - {data["amount"]} \
                 {data["measurement_unit"]}\n'
+        content = content.encode('utf-8').decode(
+            'unicode_escape').encode('utf-8')
         return content, 'shopping_cart.txt', 'text/plain'
 
 
