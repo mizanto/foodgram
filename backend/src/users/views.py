@@ -11,6 +11,7 @@ from .models import Subscription
 from .paginators import UsersPaginator
 from .serializers import (SetPasswordSerializer, UserLoginSerializer,
                           UserRegisterSerializer, UserSerializer)
+from users.serializers import UserSubscriptionSerializer
 
 User = get_user_model()
 
@@ -64,10 +65,12 @@ class UserViewSet(viewsets.ModelViewSet):
             following__user=request.user).order_by('username')
         page = self.paginate_queryset(subscriptions)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = UserSubscriptionSerializer(
+                page, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(subscriptions, many=True)
+        serializer = UserSubscriptionSerializer(
+            subscriptions, many=True, context={'request': request})
         return Response(serializer.data)
 
     @action(detail=True,
