@@ -146,11 +146,11 @@ jobs:
             # останавливаем контейнеры
             sudo docker-compose -f docker-compose.prod.yml stop
 
-            # удаляем старые образы foodgram-backend и если они есть
-            IMAGE_IDS=$(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/foodgram-backend)
-            if [ -n "$IMAGE_IDS" ]; then
-                sudo docker image rm --force $IMAGE_IDS
-            fi
+            # # удаляем старые образы foodgram-backend и если они есть
+            # IMAGE_IDS=$(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/foodgram-backend)
+            # if [ -n "$IMAGE_IDS" ]; then
+            #     sudo docker image rm --force $IMAGE_IDS
+            # fi
 
             # скачиваем последний образ foodgram-backend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
