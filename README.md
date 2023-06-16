@@ -1,3 +1,5 @@
+[![Main YAMDB workflow](https://github.com/mizanto/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)](https://github.com/mizanto/yamdb_final/actions/workflows/yamdb_workflow.yml)
+
 # Foodgram - Ваш рецепт успеха
 [Foodgram]() - это проект, в котором пользователи могут делиться своими кулинарными рецептами, а также подписываться на понравившихся авторов и сохранять лучшие рецепты в своих "Избранных".
 
