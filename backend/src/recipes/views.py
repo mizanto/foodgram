@@ -94,6 +94,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         content = "Список покупок:\n\nАвокадо - 1.0 шт\nПомидоры - 2.0 шт\nКрасный лук - 1.0 шт\nОливковое масло - 2.0 ст.л\nСок лимона - 1.0 ч.л\nамарантовая мука - 100.0 г\nМолоко - 5.0 ст.л\n"
 
         response = HTTPResponse(content, content_type='text/plain; charset=utf8')
+        response['Content-Type'] = 'text/plain; charset=utf8'
         response['Content-Disposition'] = 'attachment; filename=shopping_list.txt'
 
         # format = self._get_format(request)
