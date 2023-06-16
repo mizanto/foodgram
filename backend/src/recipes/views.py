@@ -1,4 +1,4 @@
-from http.client import HTTPResponse
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -93,7 +93,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         
         content = "Список покупок:\n\nАвокадо - 1.0 шт\nПомидоры - 2.0 шт\nКрасный лук - 1.0 шт\nОливковое масло - 2.0 ст.л\nСок лимона - 1.0 ч.л\nамарантовая мука - 100.0 г\nМолоко - 5.0 ст.л\n"
 
-        response = HTTPResponse(content)
+        response = HttpResponse(content)
         response['Content-Type'] = 'text/plain; charset=utf8'
         response['Content-Disposition'] = 'attachment; filename=shopping_list.txt'
 
