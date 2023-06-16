@@ -21,7 +21,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         data_path = options['data_path']
-        print(f'Importing data from {data_path}...')
         self.import_users_from_csv(data_path + 'users.csv')
         self.stdout.write(self.style.SUCCESS('Imported users'))
         self.import_tags_from_csv(data_path + 'tags.csv')
@@ -91,7 +90,6 @@ class Command(BaseCommand):
             self.generate_recipe_for_user(user, recipe_data, data_path)
 
     def generate_recipe_for_user(self, user, recipe_data, data_path):
-        print(f'data_path: {data_path}')
         recipe_name = recipe_data['name']
         if Recipe.objects.filter(name=recipe_name).exists():
             return
@@ -120,7 +118,6 @@ class Command(BaseCommand):
             recipe.save()
 
         for tag in tags:
-            print(f'tag: {tag}')
             RecipeTag.objects.create(recipe=recipe, tag=tag)
 
         for ingredient_data in recipe_data['ingredients']:
