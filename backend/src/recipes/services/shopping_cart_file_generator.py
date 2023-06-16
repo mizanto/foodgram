@@ -20,19 +20,13 @@ class FileGenerator:
 
 class TextFileGenerator(FileGenerator):
     def generate(self, ingredients):
-        content = io.StringIO()
-        content.write('Список покупок:')
-
+        content = 'Список покупок:\n\n'
         for name, data in ingredients.items():
-            content.write(
-                f'{name} - {data["amount"]} {data["measurement_unit"]}')
-
-        content = content.getvalue()
-        # content = 'Список покупок:\n\n'
-        # for name, data in ingredients.items():
-        #     content += f'{name} - {data["amount"]} \
-        #         {data["measurement_unit"]}\n'
-        return content, 'shopping_cart.txt', 'text/plain, charset=utf-8'
+            content += f'{name} - {data["amount"]} ' \
+                       f'{data["measurement_unit"]}\n'
+        return (content.encode("utf-8"),
+                'shopping_cart.txt',
+                'text/plain; charset=utf-8')
 
 
 class CsvFileGenerator(FileGenerator):
