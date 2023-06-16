@@ -135,8 +135,6 @@ jobs:
             sudo systemctl stop nginx
             sudo systemctl stop gunicorn
 
-            sudo docker-compose -f docker-compose.prod.yml stop
-
             touch .env
             echo "DB_ENGINE=${{ secrets.DB_ENGINE }}" > .env
             echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
@@ -145,14 +143,26 @@ jobs:
             echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
             echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
 
-            sudo docker image rm sergben/foodgram-backend:latest
-            sudo docker pull sergben/foodgram-backend:latest
+            # останавливаем контейнеры
+            sudo docker-compose -f docker-compose.prod.yml stop
 
-            # sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
-            sudo docker-compose -f docker-compose.prod.yml up -d --build
+            # удаляем старые образы foodgram-backend и если они есть
+            IMAGE_IDS=$(sudo docker images -q ${{ secrets.DOCKER_USERNAME }}/foodgram-backend)
+            if [ -n "$IMAGE_IDS" ]; then
+                sudo docker image rm --force $IMAGE_IDS
+            fi
 
+            # скачиваем последний образ foodgram-backend
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
+
+            # запускаем контейнеры
+            sudo docker-compose -f docker-compose.prod.yml up -d
+
+            # выполняем миграции, собираем статику и загружаем данные
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --no-input
+            sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py import_basic_data ../data/
+        
 
   send_message:
     name: Send message
