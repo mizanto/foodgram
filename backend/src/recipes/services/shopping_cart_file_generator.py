@@ -24,7 +24,7 @@ class TextFileGenerator(FileGenerator):
         for name, data in ingredients.items():
             content += f'{name} - {data["amount"]} \
                 {data["measurement_unit"]}\n'
-        return content, 'shopping_cart.txt', 'text/plain'
+        return content, 'shopping_cart.txt', 'text/plain, charset=utf-8'
 
 
 class CsvFileGenerator(FileGenerator):
@@ -35,4 +35,4 @@ class CsvFileGenerator(FileGenerator):
         for name, data in ingredients.items():
             writer.writerow([name, data["amount"], data["measurement_unit"]])
         return output.getvalue().encode('utf-8'), \
-            'shopping_cart.csv', 'text/csv'
+            'shopping_cart.csv', 'text/csv, charset=utf-8'
