@@ -1,4 +1,3 @@
-from http.client import HTTPResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -104,15 +103,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(
                 {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        response = HTTPResponse(content, content_type=content_type)
+        response = Response(content, content_type=content_type)
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
         return response
 
     def _get_format(self, request):
         format = request.query_params.get('format')
         if format and format.lower() in ['txt', 'csv']:
             return format
-        return 'txt'
+        return 'csv'
 
     def _add_to_shopping_cart(self, request, recipe):
         _, created = ShoppingCart.objects.get_or_create(
