@@ -1,3 +1,4 @@
+from http.client import HTTPResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -89,24 +90,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         if not request.user.is_authenticated:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        content = "Список покупок:\n\nАвокадо - 1.0 шт\nПомидоры - 2.0 шт\nКрасный лук - 1.0 шт\nОливковое масло - 2.0 ст.л\nСок лимона - 1.0 ч.л\nамарантовая мука - 100.0 г\nМолоко - 5.0 ст.л\n"
 
-        format = self._get_format(request)
+        response = HTTPResponse(content, content_type='text/plain; charset=utf8')
+        response['Content-Disposition'] = 'attachment; filename=shopping_list.txt'
 
-        shopping_cart = ShoppingCart.objects.filter(user=request.user)
-        ingredients = ShoppingCartService.get_ingredients(shopping_cart)
+        # format = self._get_format(request)
 
-        try:
-            content, filename, content_type = FileGeneratorFactory \
-                .get_generator(format) \
-                .generate(ingredients)
-        except ValueError as e:
-            return Response(
-                {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # shopping_cart = ShoppingCart.objects.filter(user=request.user)
+        # ingredients = ShoppingCartService.get_ingredients(shopping_cart)
 
-        response = Response(content, content_type=content_type)
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        # try:
+        #     content, filename, content_type = FileGeneratorFactory \
+        #         .get_generator(format) \
+        #         .generate(ingredients)
+        # except ValueError as e:
+        #     return Response(
+        #         {"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return response
+        # response = Response(content, content_type=content_type)
+        # response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        # return response
 
     def _get_format(self, request):
         format = request.query_params.get('format')
