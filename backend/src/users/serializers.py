@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request', None)
-        if request:
+        if request and request.user.is_authenticated:
             return Subscription.objects.filter(
                 user=request.user, author=obj).exists()
         return False
@@ -59,7 +59,8 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         from recipes.serializers import ShortRecipeSerializer
 
-        recipes_limit = self.context['request'].query_params.get('recipes_limit')
+        recipes_limit = self.context['request'].query_params.get(
+            'recipes_limit')
         try:
             recipes_limit = int(recipes_limit)
         except ValueError:
@@ -70,7 +71,7 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request', None)
-        if request:
+        if request and request.user.is_authenticated:
             return Subscription.objects.filter(
                 user=request.user, author=obj).exists()
         return False

@@ -76,6 +76,7 @@ class RecipeRetriveSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.in_cart.filter(user=request.user).exists()
+        return False
 
 
 class Base64ImageField(serializers.ImageField):
