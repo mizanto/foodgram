@@ -1,4 +1,4 @@
-[![Foodgram workflow](https://github.com/mizanto/foodgram-project-react/blob/master/.github/workflows/main.yml.svg)](https://github.com/mizanto/foodgram-project-react/blob/master/.github/workflows/main.yml)
+[![Foodgram workflow](https://github.com/mizanto/foodgram-project-react/actions/workflows/main.yml/badge.svg)](https://github.com/mizanto/foodgram-project-react/actions/workflows/main.yml)
 
 
 https://github.com/mizanto/foodgram-project-react/blob/master/.github/workflows/main.yml
