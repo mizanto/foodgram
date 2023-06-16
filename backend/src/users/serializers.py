@@ -59,8 +59,7 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         from recipes.serializers import ShortRecipeSerializer
 
-        recipes_limit = self.context['request'].query_params.get(
-            'recipes_limit')
+        recipes_limit = self.context['request'].query_params.get('recipes_limit')
         try:
             recipes_limit = int(recipes_limit)
         except ValueError:
