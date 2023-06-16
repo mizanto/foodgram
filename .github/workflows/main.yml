@@ -115,7 +115,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
-          source: "infra/docker-compose.yml,infra/nginx.conf"
+          source: "infra/docker-compose.prod.yml,infra/nginx.conf"
           target: "./"
           strip_components: 1
 
@@ -137,7 +137,6 @@ jobs:
             sudo systemctl stop gunicorn
 
             sudo docker-compose stop
-            sudo docker-compose rm -f backend
 
             touch .env
             echo "DB_ENGINE=${{ secrets.DB_ENGINE }}" > .env
@@ -152,7 +151,7 @@ jobs:
                 sudo docker image rm --force $IMAGE_IDS
             fi
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend:latest
-            sudo docker-compose up -d
+            sudo docker-compose -f docker-compose.prod.yml up
 
             sudo docker-compose exec -T backend python manage.py migrate
             sudo docker-compose exec -T backend python manage.py collectstatic --no-input
