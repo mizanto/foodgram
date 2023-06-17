@@ -39,7 +39,7 @@ class TagTest(APITestCase):
 
     def test_get_all_tags(self):
         response = self.client.get(
-            reverse("api:recipes:tag-list")
+            reverse("api:tag-list")
         )
         expected = Tag.objects.all()
         serialized = TagSerializer(expected, many=True)
@@ -48,7 +48,7 @@ class TagTest(APITestCase):
 
     def test_get_single_tag(self):
         response = self.client.get(
-            reverse("api:recipes:tag-detail",
+            reverse("api:tag-detail",
                     kwargs={"pk": self.tag1.pk})
         )
         expected = Tag.objects.get(pk=self.tag1.pk)
@@ -73,7 +73,7 @@ class IngredientTest(APITestCase):
 
     def test_get_all_ingredients(self):
         response = self.client.get(
-            reverse("api:recipes:ingredient-list")
+            reverse("api:ingredient-list")
         )
         expected = Ingredient.objects.all()
         serialized = IngredientSerializer(expected, many=True)
@@ -82,7 +82,7 @@ class IngredientTest(APITestCase):
 
     def test_get_single_ingredient(self):
         response = self.client.get(
-            reverse("api:recipes:ingredient-detail",
+            reverse("api:ingredient-detail",
                     kwargs={"pk": self.ingredient1.pk})
         )
         expected = Ingredient.objects.get(pk=self.ingredient1.pk)
@@ -92,7 +92,7 @@ class IngredientTest(APITestCase):
 
     def test_search_ingredients(self):
         response = self.client.get(
-            reverse("api:recipes:ingredient-list"), {'name': 'ingredient'}
+            reverse("api:ingredient-list"), {'name': 'ingredient'}
         )
         startswith_expected = Ingredient.objects.filter(
             name__istartswith='ingredient')
@@ -174,7 +174,7 @@ class RecipeListViewTests(APITestCase):
         self._create_test_recipes()
         params = params or {}
         response = self.unauthorized_client.get(
-            reverse('api:recipes:recipe-list'), params)
+            reverse('api:recipe-list'), params)
         recipes = Recipe.objects.all()[recipes_slice]
         self._assert_response_list(response, recipes)
 
@@ -210,7 +210,7 @@ class RecipeListViewTests(APITestCase):
 
     def test_get_recipes_list_with_tag_filter(self):
         response = self.unauthorized_client.get(
-            reverse('api:recipes:recipe-list'), {"tags": self.tag.id})
+            reverse('api:recipe-list'), {"tags": self.tag.id})
         recipes = Recipe.objects.filter(tags__id=1)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -218,7 +218,7 @@ class RecipeListViewTests(APITestCase):
 
     def test_get_recipes_list_with_author_filter(self):
         response = self.unauthorized_client.get(
-            reverse('api:recipes:recipe-list'), {"author": self.test_user.id})
+            reverse('api:recipe-list'), {"author": self.test_user.id})
         recipes = Recipe.objects.filter(author__id=1)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -229,12 +229,12 @@ class RecipeListViewTests(APITestCase):
             user=self.test_user, recipe=self.recipe)
 
         response = self.authorized_client.get(
-            reverse('api:recipes:recipe-list'), {"is_favorited": True}
+            reverse('api:recipe-list'), {"is_favorited": True}
         )
         recipes = Recipe.objects.filter(favorited_by__user=self.test_user)
 
         factory = APIRequestFactory()
-        request = factory.get(reverse('api:recipes:recipe-list'))
+        request = factory.get(reverse('api:recipe-list'))
         request.user = self.test_user
         serializer = RecipeRetriveSerializer(
             recipes, many=True, context={'request': request})
@@ -253,7 +253,7 @@ class RecipeListViewTests(APITestCase):
         url_params = urlencode(
             [('tags', slug) for slug in tag_slugs], doseq=True)
         response = self.unauthorized_client.get(
-            f"{reverse('api:recipes:recipe-list')}?{url_params}")
+            f"{reverse('api:recipe-list')}?{url_params}")
         recipes = Recipe.objects.filter(tags__slug__in=tag_slugs)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -261,7 +261,7 @@ class RecipeListViewTests(APITestCase):
 
     def test_get_recipe_by_id(self):
         response = self.unauthorized_client.get(
-            reverse('api:recipes:recipe-detail',
+            reverse('api:recipe-detail',
                     kwargs={'pk': self.recipe.id}))
         recipe = Recipe.objects.get(id=1)
         serializer = RecipeRetriveSerializer(recipe)
@@ -279,7 +279,7 @@ class RecipeListViewTests(APITestCase):
         }
 
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-list'),
+            reverse('api:recipe-list'),
             data=recipe_data,
             format='json'
         )
@@ -298,7 +298,7 @@ class RecipeListViewTests(APITestCase):
         }
 
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-list'), data=recipe_data)
+            reverse('api:recipe-list'), data=recipe_data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -316,7 +316,7 @@ class RecipeListViewTests(APITestCase):
         }
 
         response = self.authorized_client.patch(
-            reverse('api:recipes:recipe-detail',
+            reverse('api:recipe-detail',
                     kwargs={'pk': self.recipe.id}),
             data=recipe_data,
             format='json'
@@ -327,7 +327,7 @@ class RecipeListViewTests(APITestCase):
     def test_delete_recipe(self):
         id_to_delete = self.recipe.id
         response = self.authorized_client.delete(
-            reverse('api:recipes:recipe-detail',
+            reverse('api:recipe-detail',
                     kwargs={'pk': id_to_delete})
         )
 
@@ -336,7 +336,7 @@ class RecipeListViewTests(APITestCase):
 
     def test_add_to_favorites(self):
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-favorite',
+            reverse('api:recipe-favorite',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -346,7 +346,7 @@ class RecipeListViewTests(APITestCase):
     def test_remove_from_favorites(self):
         Favorite.objects.create(user=self.test_user, recipe=self.recipe)
         response = self.authorized_client.delete(
-            reverse('api:recipes:recipe-favorite',
+            reverse('api:recipe-favorite',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -356,21 +356,21 @@ class RecipeListViewTests(APITestCase):
     def test_add_to_favorites_twice(self):
         Favorite.objects.create(user=self.test_user, recipe=self.recipe)
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-favorite',
+            reverse('api:recipe-favorite',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_remove_from_favorites_not_existed(self):
         response = self.authorized_client.delete(
-            reverse('api:recipes:recipe-favorite',
+            reverse('api:recipe-favorite',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_add_recipe_to_shopping_cart(self):
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         query_set = ShoppingCart.objects.filter(
@@ -380,7 +380,7 @@ class RecipeListViewTests(APITestCase):
 
     def test_add_recipe_to_shopping_cart_unauthenticated(self):
         response = self.unauthorized_client.post(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -388,7 +388,7 @@ class RecipeListViewTests(APITestCase):
     def test_remove_recipe_from_shopping_cart(self):
         ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
         response = self.authorized_client.delete(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         query_set = ShoppingCart.objects.filter(
@@ -398,14 +398,14 @@ class RecipeListViewTests(APITestCase):
 
     def test_remove_recipe_from_shopping_cart_not_existed(self):
         response = self.authorized_client.delete(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_remove_recipe_from_shopping_cart_unauthenticated(self):
         response = self.unauthorized_client.delete(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -413,7 +413,7 @@ class RecipeListViewTests(APITestCase):
     def test_add_recipe_to_shopping_cart_twice(self):
         ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
         response = self.authorized_client.post(
-            reverse('api:recipes:recipe-shopping-cart',
+            reverse('api:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -421,7 +421,7 @@ class RecipeListViewTests(APITestCase):
     def test_download_shopping_cart(self):
         ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
         response = self.authorized_client.get(
-            reverse('api:recipes:recipe-download-shopping-cart')
+            reverse('api:recipe-download-shopping-cart')
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(response.content)
