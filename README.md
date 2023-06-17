@@ -23,7 +23,7 @@
 │       ├── Dockerfile.dev
 │       ├── Dockerfile.prod
 │       ├── manage.py
-|		├── requirements.txt
+|	├── requirements.txt
 │       ├── api
 │       │   └── ...
 │       ├── foodgram
@@ -51,11 +51,12 @@
 git clone git@github.com:mizanto/foodgram-project-react.git
 cd foodgram-project-react
 ``` 
-### Создание виртуального окружения
+### Создание виртуального и активация окружения
 Перейдите в папку `backend` и создайте виртуальное окружение:
 ```bash
 cd backend
 python -m venv venv
+source venv/bin/activate
 ```
 
 ### Установка зависимостей
