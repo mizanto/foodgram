@@ -14,5 +14,6 @@ urlpatterns = [
     path('set_password/', UserViewSet.as_view({'post': 'set_password'}),
          name='user-set-password'),
     path('auth/token/login/', UserLoginAPIView.as_view(), name='user-login'),
-    path('auth/token/logout/', UserLogoutAPIView.as_view(), name='user-logout'),
+    path('auth/token/logout/', UserLogoutAPIView.as_view(),
+         name='user-logout'),
 ]
