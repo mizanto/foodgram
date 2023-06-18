@@ -34,57 +34,57 @@ class UserViewTests(APITestCase):
 
     def test_user_list_authorized_user(self):
         response = self.authorized_client.get(
-            reverse('api:user-list'))
+            reverse('users:user-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_list_unauthorized_user(self):
         response = self.unauthorized_client.get(
-            reverse('api:user-list'))
+            reverse('users:user-list'))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_detail_unauthorized_user(self):
         response = self.unauthorized_client.get(
-            reverse('api:user-detail', args=[self.test_user1.id]))
+            reverse('users:user-detail', args=[self.test_user1.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_me(self):
-        response = self.authorized_client.get(reverse('api:user-me'))
+        response = self.authorized_client.get(reverse('users:user-me'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_login(self):
         response = self.unauthorized_client.post(
-            reverse('api:user-login'),
+            reverse('users:user-login'),
             {'email': 'user1@user.co', 'password': '1qa!QA1qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_logout_authorized_user(self):
         response = self.authorized_client.post(
-            reverse('api:user-logout'))
+            reverse('users:user-logout'))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_logout_unauthorized_user(self):
         response = self.unauthorized_client.post(
-            reverse('api:user-logout'))
+            reverse('users:user-logout'))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_change_password_authorized_user(self):
         response = self.authorized_client.post(
-            reverse('api:user-set-password'),
+            reverse('users:user-set-password'),
             {'current_password': '1qa!QA1qa', 'new_password': '1qa!QA2qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_change_password_unauthorized_user(self):
         response = self.unauthorized_client.post(
-            reverse('api:user-set-password'),
+            reverse('users:user-set-password'),
             {'current_password': '1qa!QA1qa', 'new_password': '1qa!QA2qa'}
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_registraion(self):
         response = self.unauthorized_client.post(
-            reverse('api:user-list'),
+            reverse('users:user-list'),
             {
                 'email': 'new_user@user.co',
                 'username': 'new_user',
@@ -95,7 +95,7 @@ class UserViewTests(APITestCase):
 
     def test_get_subscriptions(self):
         response = self.authorized_client.get(
-            reverse('api:user-subscriptions'))
+            reverse('users:user-subscriptions'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['email'], self.test_user2.email)
@@ -104,7 +104,7 @@ class UserViewTests(APITestCase):
         new_user = User.objects.create_user(
             email="user3@test.com", username='user3', password="password")
         response = self.authorized_client.post(
-            reverse('api:user-subscribe', kwargs={'pk': new_user.id}))
+            reverse('users:user-subscribe', kwargs={'pk': new_user.id}))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
             self.test_user1.follower.filter(author=new_user).exists())
@@ -114,7 +114,7 @@ class UserViewTests(APITestCase):
             email="user3@test.com", username='user3', password="password")
         self.test_user1.follower.create(author=new_user, user=self.test_user1)
         response = self.authorized_client.delete(
-            reverse('api:user-subscribe', kwargs={'pk': new_user.id}))
+            reverse('users:user-subscribe', kwargs={'pk': new_user.id}))
         self.assertEqual(response.status_code, 204)
         self.assertFalse(
             self.test_user1.follower.filter(author=new_user).exists())
