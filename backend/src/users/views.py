@@ -7,11 +7,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from users.serializers import UserSubscriptionSerializer
+
 from .models import Subscription
 from .paginators import UsersPaginator
 from .serializers import (SetPasswordSerializer, UserLoginSerializer,
                           UserRegisterSerializer, UserSerializer)
-from users.serializers import UserSubscriptionSerializer
 
 User = get_user_model()
 
@@ -43,19 +44,19 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes=[IsAuthenticated])
     def set_password(self, request):
         serializer = SetPasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            current_password_valid = check_password(
-                serializer.validated_data.get('current_password'),
-                request.user.password
-            )
-            if not current_password_valid:
-                return Response({"current_password": ["Wrong password."]},
-                                status=status.HTTP_400_BAD_REQUEST)
-            request.user.set_password(
-                serializer.validated_data.get('new_password'))
-            request.user.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+
+        current_password_valid = check_password(
+            serializer.validated_data.get('current_password'),
+            request.user.password
+        )
+        if not current_password_valid:
+            return Response({"current_password": ["Wrong password."]},
+                            status=status.HTTP_400_BAD_REQUEST)
+        request.user.set_password(
+            serializer.validated_data.get('new_password'))
+        request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False,
             methods=['get'],
@@ -80,10 +81,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def subscribe(self, request, pk=None):
         if request.method == 'POST':
             return self._add_subscription(request, pk)
-        elif request.method == 'DELETE':
+        if request.method == 'DELETE':
             return self._remove_subscription(request, pk)
-        else:
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def _add_subscription(self, request, pk=None):
         user_to_subscribe = self.get_object()

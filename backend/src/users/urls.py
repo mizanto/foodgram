@@ -1,6 +1,7 @@
 # users/urls.py
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
 from .views import UserLoginAPIView, UserLogoutAPIView, UserViewSet
 
 app_name = 'users'

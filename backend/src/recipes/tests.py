@@ -32,6 +32,7 @@ class TagTest(APITestCase):
     def create_tag(name="", color="", slug=""):
         if name != "" and color != "" and slug != "":
             return Tag.objects.create(name=name, color=color, slug=slug)
+        return None
 
     def setUp(self):
         self.tag1 = self.create_tag("tag1", "#123456", "tag1")
@@ -66,6 +67,7 @@ class IngredientTest(APITestCase):
             return Ingredient.objects.create(
                 name=name, measurement_unit=measurement_unit
             )
+        return None
 
     def setUp(self):
         self.ingredient1 = self.create_ingredient("ingredient1", "kg")
@@ -181,7 +183,7 @@ class RecipeListViewTests(APITestCase):
     def _assert_response_list(self, response, recipes):
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListResponseMatchesSerializer(response, serializer)
+        self.assert_list_response_matches_serializer(response, serializer)
 
     def test_get_recipes_list_without_params(self):
         self._test_get_recipes_list()
@@ -189,7 +191,8 @@ class RecipeListViewTests(APITestCase):
     def test_get_recipes_list_with_pagination(self):
         self._test_get_recipes_list({"limit": 5, "page": 2}, slice(5, 10))
 
-    def assertResponseMatchesSerializer(self, response_item, serializer_item):
+    def assert_response_matches_serializer(
+            self, response_item, serializer_item):
         for key in response_item.keys():
             if key == 'image':
                 self.assertEqual(
@@ -199,13 +202,13 @@ class RecipeListViewTests(APITestCase):
             else:
                 self.assertEqual(response_item[key], serializer_item[key])
 
-    def assertListResponseMatchesSerializer(self, response, serializer):
+    def assert_list_response_matches_serializer(self, response, serializer):
         response_data = response.data.get('results')
         serializer_data = serializer.data
 
         for response_item, serializer_item in zip(response_data,
                                                   serializer_data):
-            self.assertResponseMatchesSerializer(
+            self.assert_response_matches_serializer(
                 response_item, serializer_item)
 
     def test_get_recipes_list_with_tag_filter(self):
@@ -214,7 +217,7 @@ class RecipeListViewTests(APITestCase):
         recipes = Recipe.objects.filter(tags__id=1)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListResponseMatchesSerializer(response, serializer)
+        self.assert_list_response_matches_serializer(response, serializer)
 
     def test_get_recipes_list_with_author_filter(self):
         response = self.unauthorized_client.get(
@@ -222,7 +225,7 @@ class RecipeListViewTests(APITestCase):
         recipes = Recipe.objects.filter(author__id=1)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListResponseMatchesSerializer(response, serializer)
+        self.assert_list_response_matches_serializer(response, serializer)
 
     def test_get_recipes_list_with_is_favorited_filter(self):
         Favorite.objects.create(
@@ -240,7 +243,7 @@ class RecipeListViewTests(APITestCase):
             recipes, many=True, context={'request': request})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListResponseMatchesSerializer(response, serializer)
+        self.assert_list_response_matches_serializer(response, serializer)
 
     def test_get_recipes_list_with_multiple_tags_filter(self):
         tag1 = Tag.objects.create(name="lunch", color="#E16B8C", slug="lunch")
@@ -257,7 +260,7 @@ class RecipeListViewTests(APITestCase):
         recipes = Recipe.objects.filter(tags__slug__in=tag_slugs)
         serializer = RecipeRetriveSerializer(recipes, many=True)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertListResponseMatchesSerializer(response, serializer)
+        self.assert_list_response_matches_serializer(response, serializer)
 
     def test_get_recipe_by_id(self):
         response = self.unauthorized_client.get(
@@ -266,7 +269,7 @@ class RecipeListViewTests(APITestCase):
         recipe = Recipe.objects.get(id=1)
         serializer = RecipeRetriveSerializer(recipe)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertResponseMatchesSerializer(response.data, serializer.data)
+        self.assert_response_matches_serializer(response.data, serializer.data)
 
     def test_create_recipe(self):
         recipe_data = {
@@ -383,7 +386,7 @@ class RecipeListViewTests(APITestCase):
             reverse('recipes:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_remove_recipe_from_shopping_cart(self):
         ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)
@@ -408,7 +411,7 @@ class RecipeListViewTests(APITestCase):
             reverse('recipes:recipe-shopping-cart',
                     kwargs={'pk': self.recipe.id})
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_add_recipe_to_shopping_cart_twice(self):
         ShoppingCart.objects.create(user=self.test_user, recipe=self.recipe)

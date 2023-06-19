@@ -1,21 +1,23 @@
-from recipes.models import Recipe, RecipeIngredient
+from django.db.models import Sum
+
+from recipes.models import RecipeIngredient
 
 
 class ShoppingCartService:
     @staticmethod
     def get_ingredients(shopping_cart):
         ingredients = {}
-        for item in shopping_cart:
-            recipe = Recipe.objects.get(id=item.recipe.id)
-            for ingredient in recipe.ingredients.all():
-                recipe_ingredient = RecipeIngredient.objects.get(
-                    recipe=recipe, ingredient=ingredient)
-                amount = recipe_ingredient.amount
-                if ingredient.name in ingredients:
-                    ingredients[ingredient.name]['amount'] += amount
-                else:
-                    ingredients[ingredient.name] = {
-                        'amount': amount,
-                        'measurement_unit': ingredient.measurement_unit
-                    }
+        recipe_ids = shopping_cart.values_list('recipe_id', flat=True)
+        recipe_ingredients = (
+            RecipeIngredient.objects
+            .filter(recipe_id__in=recipe_ids)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(total_amount=Sum('amount'))
+        )
+
+        for ingredient in recipe_ingredients:
+            ingredients[ingredient['ingredient__name']] = {
+                'amount': ingredient['total_amount'],
+                'measurement_unit': ingredient['ingredient__measurement_unit']
+            }
         return ingredients
