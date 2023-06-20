@@ -71,6 +71,14 @@ jobs:
           while ! pg_isready -h localhost -p 5432 > /dev/null 2> /dev/null; do
             sleep 1
           done
+      
+      - name: Send fail message to Telegram
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: "Tests job in Foodgram workflow failed ❗"
 
   build_and_push_to_docker_hub:
     name: Push image to Docker Hub
@@ -98,6 +106,14 @@ jobs:
           context: .
           file: backend/src/Dockerfile.prod
 
+      - name: Send fail message to Telegram
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: "Build and Push job in Foodgram workflow failed ❗"
+
   update_configs:
     name: Update configs
     runs-on: ubuntu-latest
@@ -117,6 +133,14 @@ jobs:
           source: "infra/docker-compose.prod.yml,infra/nginx.conf"
           target: "./"
           strip_components: 1
+      
+      - name: Send fail message to Telegram
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: "Update configs job in Foodgram workflow failed ❗"
 
   deploy:
     name: Deploy to Yandex.Cloud
@@ -157,8 +181,15 @@ jobs:
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --no-input
             sudo docker-compose -f docker-compose.prod.yml exec -T backend python manage.py import_basic_data ../data/
-        
 
+      - name: Send fail message to Telegram
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: "Deploy job in Foodgram workflow failed ❗"
+        
   send_message:
     name: Send message
     runs-on: ubuntu-latest
