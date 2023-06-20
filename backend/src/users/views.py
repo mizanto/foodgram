@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.serializers import UserSubscriptionSerializer
-
 from .models import Subscription
 from .paginators import UsersPaginator
 from .serializers import (SetPasswordSerializer, UserLoginSerializer,
@@ -81,9 +80,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def subscribe(self, request, pk=None):
         if request.method == 'POST':
             return self._add_subscription(request, pk)
-        if request.method == 'DELETE':
-            return self._remove_subscription(request, pk)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return self._remove_subscription(request, pk)
 
     def _add_subscription(self, request, pk=None):
         user_to_subscribe = self.get_object()
