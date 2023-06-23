@@ -98,6 +98,12 @@ class RecipeCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"ingredients": ["All ingredients must be unique."]})
 
+        for ingredient in data['ingredients']:
+            if ingredient['amount'] <= 0:
+                raise serializers.ValidationError(
+                    {"ingredients": ["Amount of each ingredient"
+                                     "must be more than zero."]})
+
         if len(data['tags']) == 0:
             raise serializers.ValidationError(
                 {"tags": ["This field is required."]})
